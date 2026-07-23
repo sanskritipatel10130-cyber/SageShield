@@ -1,8 +1,10 @@
-from flask import Flask, request
+from flask import Flask, request, jsonify
+from flask_cors import CORS
 from html import escape
 import re
 
 app = Flask("phishing_detector")
+CORS(app)  # <--- THIS IS WHAT ALLOWS CHROME EXTENSIONS TO CONNECT
 
 def check_email(emailtext):
     suspicious_words = [
@@ -134,5 +136,42 @@ def home():
 
     return open("templates/index.html").read()
 
+
+# --- NEW ROUTE ADDED FOR CHROME EXTENSION ---
+@app.route("/api/analyze", methods=["POST"])
+def api_analyze():
+    data = request.get_json() or {}
+    emailtext = data.get("emailText", "").strip()
+
+    if not emailtext:
+        return jsonify({"error": "Please provide email text."}), 400
+
+    score, found_words = check_email(emailtext)
+
+    hearts = round(score / 20)
+    if hearts < 1:
+        hearts = 1
+    if hearts > 5:
+        hearts = 5
+    heartline = "♥" * hearts + "♡" * (5 - hearts)
+
+    if score >= 50:
+        verdict = "Likely phishing"
+        message = "This email contains warning signs often used in phishing attempts."
+    else:
+        verdict = "Likely legitimate"
+        message = "This email has few common phishing warning signs."
+
+    highlighted = highlight_email(emailtext, found_words)
+
+    return jsonify({
+        "score": score,
+        "heartline": heartline,
+        "verdict": verdict,
+        "message": message,
+        "found_words": found_words,
+        "highlighted_email": highlighted
+    })
+
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=True)

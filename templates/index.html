@@ -1,0 +1,180 @@
+<!doctype html>
+<html>
+  <head>
+    <title>AI Phishing Email Detector</title>
+
+    <style>
+      body {
+        background-color: #fff7f9;
+        color: #58705b;
+        font-family: "Trebuchet MS", Arial, sans-serif;
+        text-align: center;
+        margin: 0;
+        padding: 60px 20px;
+      }
+
+      .card {
+        background-color: #ffffff;
+        max-width: 600px;
+        margin: auto;
+        padding: 40px;
+        border-radius: 24px;
+        border: 3px solid #b7cdb8;
+        box-shadow: 0 8px 18px #f0d9df;
+      }
+
+      h1 {
+        color: #86a889;
+        font-size: 38px;
+        margin-bottom: 12px;
+      }
+
+      h2 {
+        color: #86a889;
+        font-size: 21px;
+        margin-top: 34px;
+      }
+
+      p {
+        color: #68786b;
+        line-height: 1.6;
+      }
+
+      .upload-box {
+        background-color: #f1f7ef;
+        border: 2px dashed #a9c2aa;
+        border-radius: 16px;
+        padding: 28px;
+        margin: 28px 0;
+      }
+
+      input {
+        margin-top: 16px;
+      }
+
+      textarea {
+        width: 100%;
+        height: 180px;
+        padding: 14px;
+        border: 2px solid #b7cdb8;
+        border-radius: 14px;
+        box-sizing: border-box;
+        color: #58705b;
+        font-family: Arial, sans-serif;
+        font-size: 14px;
+        resize: vertical;
+      }
+
+      button {
+        background-color: #f3b6c5;
+        color: white;
+        border: none;
+        border-radius: 20px;
+        padding: 13px 26px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+      }
+
+      button:hover {
+        background-color: #eaa1b4;
+      }
+
+      .sample-button {
+        background-color: #e4f0df;
+        color: #58705b;
+        margin: 5px;
+        font-size: 13px;
+      }
+
+      .sample-button:hover {
+        background-color: #d2e4cc;
+      }
+
+      .info-box {
+        background-color: #f1f7ef;
+        border-radius: 16px;
+        padding: 20px;
+        margin-top: 30px;
+        text-align: left;
+      }
+
+      .safety-note {
+        background-color: #fff0f3;
+        border-radius: 14px;
+        color: #8a6570;
+        font-size: 13px;
+        padding: 16px;
+        margin-top: 25px;
+      }
+
+      ul {
+        line-height: 1.8;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="card">
+      <h1>AI Phishing Email Detector</h1>
+
+      <p>
+        Upload a text email or paste its content to check whether it may be phishing.
+      </p>
+
+      <form method="POST" enctype="multipart/form-data">
+        <div class="upload-box">
+          <label for="emailFile">Upload a text email:</label>
+          <br>
+          <input id="emailFile" name="emailFile" type="file" accept=".txt">
+        </div>
+
+        <p>or paste an email below:</p>
+
+        <textarea
+          id="emailText"
+          name="emailText"
+          placeholder="Paste the email content here..."
+        ></textarea>
+
+        <br><br>
+
+        <button type="submit">Analyze email</button>
+      </form>
+
+      <h2>Try a sample email</h2>
+
+      <button
+        class="sample-button"
+        type="button"
+        onclick="document.getElementById('emailText').value='Urgent! Your account has been suspended. Verify your password immediately by clicking here: http://fake-bank-login.com'"
+      >
+        Try a suspicious email
+      </button>
+
+      <button
+        class="sample-button"
+        type="button"
+        onclick="document.getElementById('emailText').value='Hello! This is a reminder that our team meeting is at 2 PM tomorrow. Thank you.'"
+      >
+        Try a safe email
+      </button>
+
+      <div class="info-box">
+        <h2>What we look for</h2>
+        <ul>
+          <li>Urgent or threatening language</li>
+          <li>Suspicious links</li>
+          <li>Requests for passwords or bank information</li>
+          <li>Generic greetings, such as “Dear Customer”</li>
+          <li>Unusual requests or short deadlines</li>
+        </ul>
+      </div>
+
+      <div class="safety-note">
+        <b>Safety reminder:</b> Do not click suspicious links or enter personal
+        information from an email you do not trust. This tool is a guide, not a guarantee.
+      </div>
+    </div>
+  </body>
+</html>

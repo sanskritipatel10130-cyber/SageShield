@@ -3,50 +3,105 @@ from flask_cors import CORS
 from html import escape
 import re
 
+# 1. INITIALIZE APP FIRST
 app = Flask("phishing_detector")
-CORS(app)  # <--- THIS IS WHAT ALLOWS CHROME EXTENSIONS TO CONNECT
+CORS(app)  # Allows Chrome Extension connections
 
 def check_email(emailtext):
+    # Normalize whitespaces and newlines into single spaces to avoid regex breaking
+    clean_email = re.sub(r'\s+', ' ', emailtext).strip().lower()
+
     suspicious_words = [
-        "urgent",
-        "verify",
-        "password",
-        "suspended",
-        "click here",
-        "bank account",
-        "act now",
-        "winner",
-        "gift card",
-        "immediately"
+        # Urgency & Typos
+        "urgent", "immediately", "immediatly", "act now", "final warning", 
+        "last chance", "time sensitive", "response required", "required action",
+        "take action", "within 24 hours", "within 48 hours", "important notice",
+        "attention", "limited time", "expires today", "deadline",
+
+        # Verification & Auth
+        "verify", "verification", "confirm", "confirmation", "confirm your account",
+        "verify your account", "verify your identity", "authenticate", "validation",
+        "login", "log in", "sign in", "password", "reset password", "security alert",
+        "account suspended", "account locked", "unusual activity", "unauthorized access",
+        "one-time password", "otp", "2fa", "mfa",
+
+        # Actions & Links
+        "click here", "click below", "follow this link", "download attachment",
+        "open attachment", "attached file", "attached invoice", "attached document",
+
+        # Financial & High Risk (Single keywords + Full phrases)
+        "give me", "credit card", "credit", "card", "debit card", "debit", "cvv", 
+        "bank account", "bank", "banking", "routing number", "account number", 
+        "payment", "payment failed", "update payment", "billing", "invoice", "refund", 
+        "tax refund", "wire transfer", "direct deposit", "financial information",
+
+        # Scam Personas & Keywords (Catch individual root words too)
+        "nigerian prince", "nigerian", "prince", "foreign prince", "royal family", 
+        "inheritance", "widow inheritance", "foreign inheritance", "winner", 
+        "you have won", "congratulations", "claim your prize", "prize", "lottery", 
+        "jackpot", "cash reward", "unclaimed funds", "beneficiary", "business proposal", 
+
+        # Crypto & Gift Cards
+        "bitcoin", "crypto", "cryptocurrency", "ethereum", "wallet", "seed phrase",
+        "gift card", "apple gift card", "amazon gift card",
+
+        # Impersonation & Security
+        "paypal", "amazon", "microsoft", "apple", "google", "netflix", "irs",
+        "social security", "ssn", "delivery failed", "tracking number", "fedex",
+        "ups", "usps", "dhl", "virus detected", "your computer is infected",
+        "technical support",
+
+        # Generic Suspicious Phrases
+        "dear customer", "dear valued customer", "kindly", "please kindly",
+        "your mailbox is full", "avoid suspension", "avoid legal action",
+        "work from home", "romance scam", "sugar daddy", "western union", "moneygram"
     ]
 
-    email_lower = emailtext.lower()
     found_words = []
 
+    # Use regex word boundaries on normalized text
     for word in suspicious_words:
-        if word in email_lower:
+        pattern = r"\b" + re.escape(word) + r"\b"
+        if re.search(pattern, clean_email):
             found_words.append(word)
 
+    # Base score calculation
     score = 15 + (len(found_words) * 15)
 
-    if "http://" in email_lower or "https://" in email_lower:
-        score = score + 20
+    # High-Risk Combination Checks
+    has_scam_identity = any(w in found_words for w in ["nigerian prince", "nigerian", "prince", "foreign prince", "royal family", "inheritance"])
+    has_urgency = any(w in found_words for w in ["urgent", "immediately", "immediatly", "act now", "take action"])
+    has_finance = any(w in found_words for w in ["credit card", "credit", "card", "bank account", "bank", "ssn", "give me", "debit"])
+
+    # High-risk combinations trigger major score boosts
+    if has_scam_identity:
+        score += 45
+    if has_urgency and has_finance:
+        score += 35
+    if has_finance and "give me" in found_words:
+        score += 30
+
+    if "http://" in clean_email or "https://" in clean_email:
+        score += 20
         found_words.append("a link")
 
-    if score > 95:
-        score = 95
+    # Keep score bounded between 0 and 95%
+    score = min(max(score, 0), 95)
+    
+    # Deduplicate matching results for clean output
+    unique_words = list(set(found_words))
 
-    return score, found_words
+    print("Found signals:", unique_words)
+    return score, unique_words
 
 def highlight_email(emailtext, found_words):
     safe_email = escape(emailtext)
 
-    for word in found_words:
+    # Sort keywords by length so longer phrases get highlighted first
+    for word in sorted(set(found_words), key=len, reverse=True):
         if word != "a link":
-            safe_word = re.escape(word)
-
             safe_email = re.sub(
-                safe_word,
+                r"\b" + re.escape(word) + r"\b",
                 lambda match: "<mark>" + match.group(0) + "</mark>",
                 safe_email,
                 flags=re.IGNORECASE
@@ -62,13 +117,7 @@ def highlight_email(emailtext, found_words):
 
 def show_result(score, found_words, emailtext):
     hearts = round(score / 20)
-
-    if hearts < 1:
-        hearts = 1
-
-    if hearts > 5:
-        hearts = 5
-
+    hearts = min(max(hearts, 1), 5)
     heartline = "♥" * hearts + "♡" * (5 - hearts)
 
     if score >= 50:
@@ -79,10 +128,9 @@ def show_result(score, found_words, emailtext):
         message = "This email has few common phishing warning signs."
 
     reasons = ""
-
     if found_words:
         for word in found_words:
-            reasons = reasons + "<li>Suspicious signal found: " + word + "</li>"
+            reasons += f"<li>Suspicious signal found: {word}</li>"
     else:
         reasons = "<li>No common phishing words or suspicious links were found.</li>"
 
@@ -119,6 +167,7 @@ def show_result(score, found_words, emailtext):
     </body>
     """
 
+# 2. DEFINE ROUTES AFTER 'app' INITIALIZATION
 @app.route("/", methods=["GET", "POST"])
 def home():
     if request.method == "POST":
@@ -136,8 +185,7 @@ def home():
 
     return open("templates/index.html").read()
 
-
-# --- NEW ROUTE ADDED FOR CHROME EXTENSION ---
+# 3. ROUTE FOR CHROME EXTENSION
 @app.route("/api/analyze", methods=["POST"])
 def api_analyze():
     data = request.get_json() or {}
@@ -149,10 +197,7 @@ def api_analyze():
     score, found_words = check_email(emailtext)
 
     hearts = round(score / 20)
-    if hearts < 1:
-        hearts = 1
-    if hearts > 5:
-        hearts = 5
+    hearts = min(max(hearts, 1), 5)
     heartline = "♥" * hearts + "♡" * (5 - hearts)
 
     if score >= 50:

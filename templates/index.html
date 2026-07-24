@@ -1,14 +1,15 @@
 <!doctype html>
-<html>
+<html lang="en">
   <head>
+    <meta charset="UTF-8">
     <title>AI Phishing Email Detector</title>
 
-    <style>
+    <style>  
       body {
         background-color: #fff7f9;
         color: #58705b;
         font-family: "Trebuchet MS", Arial, sans-serif;
-        text-align: center;
+        text-align: center; 
         margin: 0;
         padding: 60px 20px;
       }
@@ -16,16 +17,16 @@
       .card {
         background-color: #ffffff;
         max-width: 600px;
-        margin: auto;
+        margin: auto;  
         padding: 40px;
         border-radius: 24px;
         border: 3px solid #b7cdb8;
         box-shadow: 0 8px 18px #f0d9df;
       }
 
-      h1 {
+      h1 {    
         color: #86a889;
-        font-size: 38px;
+        font-size: 38px; 
         margin-bottom: 12px;
       }
 
@@ -33,12 +34,12 @@
         color: #86a889;
         font-size: 21px;
         margin-top: 34px;
-      }
+      }      
 
       p {
         color: #68786b;
         line-height: 1.6;
-      }
+      } 
 
       .upload-box {
         background-color: #f1f7ef;
@@ -55,11 +56,11 @@
       textarea {
         width: 100%;
         height: 180px;
-        padding: 14px;
+        padding: 14px; 
         border: 2px solid #b7cdb8;
         border-radius: 14px;
         box-sizing: border-box;
-        color: #58705b;
+        color: #58705b;  
         font-family: Arial, sans-serif;
         font-size: 14px;
         resize: vertical;
@@ -74,7 +75,7 @@
         font-size: 16px;
         font-weight: bold;
         cursor: pointer;
-      }
+      } 
 
       button:hover {
         background-color: #eaa1b4;
@@ -82,19 +83,19 @@
 
       .sample-button {
         background-color: #e4f0df;
-        color: #58705b;
+        color: #58705b;    
         margin: 5px;
         font-size: 13px;
       }
 
       .sample-button:hover {
         background-color: #d2e4cc;
-      }
+      } 
 
       .info-box {
         background-color: #f1f7ef;
         border-radius: 16px;
-        padding: 20px;
+        padding: 20px;  
         margin-top: 30px;
         text-align: left;
       }
@@ -104,7 +105,7 @@
         border-radius: 14px;
         color: #8a6570;
         font-size: 13px;
-        padding: 16px;
+        padding: 16px;  
         margin-top: 25px;
       }
 
@@ -115,7 +116,7 @@
   </head>
 
   <body>
-    <div class="card">
+    <div class="card">    
       <h1>AI Phishing Email Detector</h1>
 
       <p>
@@ -147,7 +148,7 @@
       <button
         class="sample-button"
         type="button"
-        onclick="document.getElementById('emailText').value='Urgent! Your account has been suspended. Verify your password immediately by clicking here: http://fake-bank-login.com'"
+        onclick="document.getElementById('emailText').value='Urgent! I am a Nigerian prince. Please give me your credit card details immediately so I can wire transfer your funds!'"
       >
         Try a suspicious email
       </button>
@@ -155,23 +156,23 @@
       <button
         class="sample-button"
         type="button"
-        onclick="document.getElementById('emailText').value='Hello! This is a reminder that our team meeting is at 2 PM tomorrow. Thank you.'"
+        onclick="document.getElementById('emailText').value='Hello! Just checking in regarding tomorrow\'s team meeting at 10 AM. Let me know if you need any adjustments to the schedule.'"
       >
         Try a safe email
       </button>
 
       <div class="info-box">
         <h2>What we look for</h2>
-        <ul>
+        <ul> 
           <li>Urgent or threatening language</li>
           <li>Suspicious links</li>
           <li>Requests for passwords or bank information</li>
           <li>Generic greetings, such as “Dear Customer”</li>
           <li>Unusual requests or short deadlines</li>
-        </ul>
+        </ul>  
       </div>
 
-      <div class="safety-note">
+      <div class="safety-note">  
         <b>Safety reminder:</b> Do not click suspicious links or enter personal
         information from an email you do not trust. This tool is a guide, not a guarantee.
       </div>
